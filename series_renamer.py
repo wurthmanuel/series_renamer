@@ -273,7 +273,7 @@ class SeriesRenamer:
             ]
             self.select_series(series_list)
         except Exception as e:
-            messagebox.showerror("Error", str(e))
+            messagebox.showerror("Error", f"Error fetching episodes: {str(e)}")
 
     def select_series(self, series_list: List[dict]):
         series_window = tk.Toplevel(self.root)
@@ -437,9 +437,18 @@ class SeriesRenamer:
                 return
 
             for index, ep in enumerate(episodes, start=self.episodes_listbox.size() + 1):
-                season = ep['season']
-                episode = ep['number']
-                episode_name = ep['name']
+                season = ep.get('season')
+                episode = ep.get('number')
+                episode_name = ep.get('name')
+
+                # Ensure season, episode, and episode_name are not None
+                if season is None:
+                    season = 0
+                if episode is None:
+                    episode = 0
+                if episode_name is None:
+                    episode_name = "Unknown Episode"
+
                 self.episodes_listbox.insert(tk.END, f"{index}. S{season:02d}E{episode:02d} - {episode_name}")
         except Exception as e:
             messagebox.showerror("Error", str(e))
