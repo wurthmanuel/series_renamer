@@ -48,7 +48,12 @@ class SeriesRenamer:
 
         self.remove_files_button = ttk.Button(self.files_button_frame, text="Remove Selected Files",
                                               command=self.remove_selected_files, state=tk.DISABLED)
-        self.remove_files_button.pack(side=tk.LEFT)
+        self.remove_files_button.pack(side=tk.LEFT, padx=5)
+
+        # Button to clear files list
+        self.clear_files_button = ttk.Button(self.files_button_frame, text="Clear Files List",
+                                             command=self.clear_files_list, state=tk.DISABLED)
+        self.clear_files_button.pack(side=tk.LEFT, padx=5)
 
         # Label for selected files
         self.files_selection_label = tk.Label(self.files_button_frame, text="", fg="grey")
@@ -95,7 +100,12 @@ class SeriesRenamer:
 
         self.remove_episodes_button = ttk.Button(self.episodes_button_frame, text="Remove Selected Episodes",
                                                  command=self.remove_selected_episodes, state=tk.DISABLED)
-        self.remove_episodes_button.pack(side=tk.LEFT)
+        self.remove_episodes_button.pack(side=tk.LEFT, padx=5)
+
+        # Button to clear episodes list
+        self.clear_episodes_button = ttk.Button(self.episodes_button_frame, text="Clear Episodes List",
+                                                command=self.clear_episodes_list, state=tk.DISABLED)
+        self.clear_episodes_button.pack(side=tk.LEFT, padx=5)
 
         # Label for selected episodes
         self.episodes_selection_label = tk.Label(self.episodes_button_frame, text="", fg="grey")
@@ -131,6 +141,16 @@ class SeriesRenamer:
         self.paned_window.paneconfig(self.files_frame, stretch="always")
         self.paned_window.paneconfig(self.episodes_frame, stretch="always")
 
+    def clear_files_list(self):
+        self.files_listbox.delete(0, tk.END)
+        self.check_lists()
+        self.update_file_selection()
+
+    def clear_episodes_list(self):
+        self.episodes_listbox.delete(0, tk.END)
+        self.check_lists()
+        self.update_episode_selection()
+
     def check_lists(self, _=None):
         files_count = self.files_listbox.size()
         episodes_count = self.episodes_listbox.size()
@@ -140,15 +160,25 @@ class SeriesRenamer:
 
         if files_count == 0 and episodes_count == 0:
             self.hint_label.config(text="nothing to rename", fg="gray")
+            self.clear_files_button.config(state=tk.DISABLED)
+            self.clear_episodes_button.config(state=tk.DISABLED)
         elif files_count > 0 and episodes_count == 0:
             self.hint_label.config(text="please fetch show titles", fg="gray")
+            self.clear_files_button.config(state=tk.NORMAL)
+            self.clear_episodes_button.config(state=tk.DISABLED)
         elif files_count == 0 and episodes_count > 0:
             self.hint_label.config(text="please add local files", fg="gray")
+            self.clear_files_button.config(state=tk.DISABLED)
+            self.clear_episodes_button.config(state=tk.NORMAL)
         elif files_count != episodes_count:
             self.hint_label.config(text="can't match lists", fg="red")
+            self.clear_files_button.config(state=tk.NORMAL)
+            self.clear_episodes_button.config(state=tk.NORMAL)
         else:
             self.hint_label.config(text="ready to rename", fg="green")
             self.rename_button.config(state=tk.NORMAL)
+            self.clear_files_button.config(state=tk.NORMAL)
+            self.clear_episodes_button.config(state=tk.NORMAL)
 
         if files_count == episodes_count and files_count > 0:
             self.hint_label.config(text="ready to rename", fg="green")
@@ -372,6 +402,9 @@ class SeriesRenamer:
             frame = ttk.Frame(seasons_window)
             frame.pack(fill=tk.BOTH, expand=True)
 
+            # Clear previous season variables
+            self.season_vars.clear()
+
             for season in seasons:
                 var = tk.BooleanVar()
                 chk = tk.Checkbutton(frame, text=f"Season {season['number']}", variable=var)
@@ -415,7 +448,9 @@ class SeriesRenamer:
             messagebox.showerror("Error", "Please select at least one season")
             return
 
+        # Clear the episodes listbox before adding new episodes
         self.episodes_listbox.delete(0, tk.END)
+
         for season_id in selected_seasons:
             self.get_episodes_by_season(season_id)
 
