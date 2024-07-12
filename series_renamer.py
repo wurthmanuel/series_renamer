@@ -70,8 +70,9 @@ class SeriesRenamer:
         self.search_label.pack(side=tk.LEFT, padx=5)
 
         self.series_name_var = tk.StringVar()
-        self.search_entry = ttk.Entry(self.search_frame, textvariable=self.series_name_var, width=40)  # Reduced width
+        self.search_entry = ttk.Entry(self.search_frame, textvariable=self.series_name_var, width=40)
         self.search_entry.pack(side=tk.LEFT, padx=5)
+        self.search_entry.bind("<Return>", self.search_series)  # Bind the Enter key to search_series
 
         self.search_button = ttk.Button(self.search_frame, text="Search", command=self.search_series)
         self.search_button.pack(side=tk.LEFT, padx=5)
@@ -237,7 +238,7 @@ class SeriesRenamer:
         messagebox.showinfo("Success", "Files have been renamed successfully.")
         preview_window.destroy()
 
-    def search_series(self):
+    def search_series(self, _=None):
         series_name = self.series_name_var.get()
         if not series_name:
             messagebox.showerror("Error", "Please enter a series name")
