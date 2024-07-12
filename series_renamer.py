@@ -267,6 +267,7 @@ class SeriesRenamer:
                     "language": item["show"]["language"],
                     "seasons": len(requests.get(f"https://api.tvmaze.com/shows/{item['show']['id']}/seasons").json()),
                     "episodes": len(requests.get(f"https://api.tvmaze.com/shows/{item['show']['id']}/episodes").json()),
+                    "premiered": item["show"]["premiered"],
                     "id": item["show"]["id"]
                 } for item in series_data
             ]
@@ -277,13 +278,13 @@ class SeriesRenamer:
     def select_series(self, series_list: List[dict]):
         series_window = tk.Toplevel(self.root)
         series_window.title("Select Series")
-        series_window.geometry("800x400")
+        series_window.geometry("900x400")
 
         frame = ttk.Frame(series_window)
         frame.pack(fill=tk.BOTH, expand=True)
 
         # Define the columns to be displayed
-        columns = ("Name", "Language", "Seasons", "Episodes", "ID")
+        columns = ("Name", "Language", "Seasons", "Episodes", "Premiered", "ID")
         tree = ttk.Treeview(frame, columns=columns, show="headings")
 
         # Set the column headings and widths
@@ -292,6 +293,7 @@ class SeriesRenamer:
             tree.column(col, width=100)
 
         tree.column("Name", width=200)
+        tree.column("Premiered", width=100)
         tree.column("ID", width=50)
 
         tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
@@ -306,15 +308,16 @@ class SeriesRenamer:
             language = series["language"]
             seasons = series["seasons"]
             episodes = series["episodes"]
+            premiered = series["premiered"]
             series_id = series["id"]
-            tree.insert("", tk.END, values=(name, language, seasons, episodes, str(series_id)))
+            tree.insert("", tk.END, values=(name, language, seasons, episodes, premiered, str(series_id)))
 
         def on_select():
             selected_items = tree.selection()
             if selected_items:
                 selected_item = selected_items[0]  # always use the first element
                 selected_series = tree.item(selected_item)["values"]
-                inner_series_id = selected_series[4]
+                inner_series_id = selected_series[5]
                 self.get_episode_list(inner_series_id)
                 series_window.destroy()
 
