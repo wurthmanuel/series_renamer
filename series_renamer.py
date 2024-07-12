@@ -310,6 +310,25 @@ class SeriesRenamer:
         cancel_button = ttk.Button(button_frame, text="Cancel", command=series_window.destroy)
         cancel_button.pack(side=tk.RIGHT, padx=5, pady=5)
 
+        # Set the window as modal
+        series_window.grab_set()
+        series_window.focus_set()
+        series_window.transient(self.root)
+
+        def on_close():
+            series_window.grab_release()
+            series_window.destroy()
+
+        series_window.protocol("WM_DELETE_WINDOW", on_close)
+
+        # Update the window layout and set its size based on the content
+        series_window.update_idletasks()
+        width = series_window.winfo_width()
+        height = series_window.winfo_height()
+        series_window.geometry(f"{width}x{height}")
+
+        self.root.wait_window(series_window)
+
     def get_episode_list(self, series_id: str):
         self.get_season_list(series_id)
 
@@ -329,7 +348,6 @@ class SeriesRenamer:
 
             seasons_window = tk.Toplevel(self.root)
             seasons_window.title("Select Seasons")
-            seasons_window.geometry("300x300")
 
             frame = ttk.Frame(seasons_window)
             frame.pack(fill=tk.BOTH, expand=True)
@@ -349,6 +367,25 @@ class SeriesRenamer:
 
             cancel_button = ttk.Button(button_frame, text="Cancel", command=seasons_window.destroy)
             cancel_button.pack(side=tk.RIGHT, padx=5, pady=5)
+
+            # Set the window as modal
+            seasons_window.grab_set()
+            seasons_window.focus_set()
+            seasons_window.transient(self.root)
+
+            def on_close():
+                seasons_window.grab_release()
+                seasons_window.destroy()
+
+            seasons_window.protocol("WM_DELETE_WINDOW", on_close)
+
+            # Update the window layout and set its size based on the content
+            seasons_window.update_idletasks()
+            width = 300
+            height = seasons_window.winfo_height()
+            seasons_window.geometry(f"{width}x{height}")
+
+            self.root.wait_window(seasons_window)
         except Exception as e:
             messagebox.showerror("Error", str(e))
 
